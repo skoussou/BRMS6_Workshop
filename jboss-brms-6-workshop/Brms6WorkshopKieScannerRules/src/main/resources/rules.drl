@@ -1,0 +1,11 @@
+package com.redhat.consulting.brms.workshop;
+
+import com.redhat.consulting.brms.workshop.model.Person;
+
+rule "Start ruleflow"
+salience 100
+when
+	$p: Person();
+then
+	System.out.println("Found person: " + $p.getName() +":"+ $p.getSurname());	 
+end

@@ -1,0 +1,44 @@
+package com.redhat.consulting.brms.cep.workshop.rules;
+
+import com.redhat.consulting.brms.cep.workshop.model.BagScannedEvent;
+import com.redhat.consulting.brms.cep.workshop.model.Location;
+
+declare BagScannedEvent
+   @role(event)
+   @timestamp(timestamp)
+   @expires(5d)
+end
+
+rule "BagScannedEvents from Stream CheckIn"
+when
+	$event1:BagScannedEvent() from entry-point "CheckIn"
+then
+	System.out.println("\nBagScannedEvent in entry-point CheckIn: " + $event1);
+end
+
+rule "BagScannedEvents from stream Sorting"
+when
+	$event1:BagScannedEvent() from entry-point "Sorting"
+then
+	System.out.println("\nBagScannedEvent in entry-point Sorting: " + $event1);
+end
+
+
+rule "BagScannedEvents from stream Staging."
+when
+	$event1:BagScannedEvent() from entry-point "Staging"
+then
+	System.out.println("\nBagScannedEvent in entry-point Staging: " + $event1);
+end
+
+ rule "CombineEventsFromDifferentStreams"
+ when
+ 	$event1:BagScannedEvent(location == Location.CHECK_IN) from entry-point "CheckIn"
+ 	$event2:BagScannedEvent(location == Location.SORTING, bagTag.id == $event1.bagTag.id, this != $event1) from entry-point "Sorting"
+ then
+ 	System.out.println("Found matching BagScannedEvents in CHECK_IN and SORTING for BagTag: " + $event1.getBagTag().getId());
+ end
+ 	
+ 
+
+

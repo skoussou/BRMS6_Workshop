@@ -1,0 +1,37 @@
+package org.jboss.ddoyle.rhsummit2014.bags;
+
+import com.redhat.consulting.brms.workshop.cep.model.BagScannedEvent;
+import com.redhat.consulting.brms.workshop.cep.model.Location;
+import com.redhat.consulting.brms.workshop.cep.model.BagLostEvent;
+
+global com.redhat.consulting.brms.workshop.cep.command.CommandFactory commandFactory;
+
+declare BagScannedEvent
+    @role( event )
+    @timestamp( timestamp.getTime() )
+    @expires( 2d )
+end
+
+declare BagLostEvent
+	@role( event )
+	@timestamp( timestamp.getTime() )
+	@expires( 2d )
+end
+
+
+rule "BaggageLostAtSorting"
+when
+    $b1:BagScannedEvent( location == Location.CHECK_IN ) from entry-point RHSummitStream
+    not BagScannedEvent( bagTag.id == $b1.bagTag.id, location == Location.SORTING, this after[0s,10m] $b1 ) from entry-point RHSummitStream
+then
+	insert(new BagLostEvent($b1.getBagTag(), Location.SORTING));
+	channels["commandDispatchChannel"].send(commandFactory.getSystemOutCommand("Baggage lost at sorting. BagTag ID: " + $b1.getBagTag().getId(), drools));
+end
+
+
+rule "Too many bags lost at sorting"
+when 
+	Number(intValue > 3) from accumulate ($b: BagLostEvent(location == Location.SORTING) over window:time(10m), count($b))
+then
+	channels["commandDispatchChannel"].send(commandFactory.getSystemOutCommand("Loosing a lot of bags here ......", drools));
+end

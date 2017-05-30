@@ -1,0 +1,28 @@
+package com.redhat.consulting.brms.cep.workshop.rules;
+
+import com.redhat.consulting.brms.cep.workshop.model.BagScannedEvent;
+import com.redhat.consulting.brms.cep.workshop.model.Location;
+import java.util.Date;
+
+//declare any global variables here
+global java.util.ArrayList messages
+
+declare BagScannedEvent
+// Lab1-a: Implement this declaration so that:
+//			* BagScannedEvent is a Drools Event typ
+//			* The BagScannedEvent#timestamp field is used as the event's timestamp by the engine
+//			* The BagScannedEvent expires after 1 day.
+end
+
+rule "BagLostBeforeSorting"
+when
+	$event1:BagScannedEvent(location == Location.CHECK_IN)
+	// Lab1-b: Implement this rule in such a way that it detects a bag being lost, if a BagScannedEvent @ SORTING 
+	//		has not happened within now and 10 minutes after the previous BagScannedEvent at CHECK_IN.
+then
+	System.out.println("--------->> Bag with BagTag UUID ["+$event1.getBagTag().getId()+"] entered at Location:["+$event1.getLocation()+"] at Time:["+$event1.getTimestamp()+"] lost before SORTING by SessionCloclTime: " + (new Date(drools.getWorkingMemory().getSessionClock().getCurrentTime())));
+	messages.add("Bag with BagTag UUID ["+$event1.getBagTag().getId()+"] entered at Location:["+$event1.getLocation()+"] at Time:["+$event1.getTimestamp()+"] lost before SORTING by SessionCloclTime: " + (new Date(drools.getWorkingMemory().getSessionClock().getCurrentTime())));end
+
+
+
+

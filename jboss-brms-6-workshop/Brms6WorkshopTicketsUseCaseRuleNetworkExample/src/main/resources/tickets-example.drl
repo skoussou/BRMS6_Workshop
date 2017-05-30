@@ -1,0 +1,58 @@
+package com.redhat.consulting.brms.workshop
+
+//list any import classes here.
+
+import com.redhat.consulting.brms.workshop.model.Event
+import com.redhat.consulting.brms.workshop.model.EventPass
+import com.redhat.consulting.brms.workshop.model.IsAdult
+import com.redhat.consulting.brms.workshop.model.Person
+import com.redhat.consulting.brms.workshop.model.Ticket
+import com.redhat.consulting.brms.workshop.model.TicketOffer
+import com.redhat.consulting.brms.workshop.model.TicketOffers
+import com.redhat.consulting.brms.workshop.model.Venue
+
+//declare any global variables here
+global com.redhat.consulting.brms.workshop.model.TicketOffers ticketOffers;
+global Brms6WorkshopTicketsUseCaseRuleNetworkExample.DiscountService discountService;
+
+declare MultipleTicketsDiscount
+	numberOfTickets: int
+end
+
+/*
+	Concepts: Tickets of type D cannot be sold to non-adults.
+	Non-adults get a 25% discount on tickets.
+	Persons with a special event pass get 10% discount on top of all discounts.
+	Golden tickets can only be sold to people with an Event pass.
+*/
+
+/*
+ The idea is to use a flow of rules
+
+ Technical Rules (assess whether someone is an adult) => Filter (filters tickets we can't sell to this person) -> Create TicketOffers with tickets that all stil there -> Apply discounts on the offers -> Apply additional discounts because of a special card,
+
+ Changing the ticket offers can cause rules to fire again, so this might be a nice use-case.
+*/
+
+rule "Is Adult"
+when 
+	$p: Person(age >=18)
+then
+	insert(new IsAdult($p));
+end
+
+rule "25% discount for non-adults"
+when
+	$p:Person()
+	not (IsAdult(person == $p))
+	$t: TicketOffer()
+	$d: Integer() from discountService.getDiscount(DiscountService.DISCOUNT_CODE.NON_ADULT);
+then
+	modify($t) {
+		addDiscount($d);	
+	}
+end
+
+
+
+
