@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kmodule xmlns="http://jboss.org/kie/6.0.0/kmodule">
+    <kbase name="TemplatesKB" packages="rules">
+    <ruleTemplate dtable="rules/data.xlsx"
+                  template="rules/template.drt"
+                  row="2" col="2"/>
+      <ksession name="TemplatesKS"/>
+      </kbase>
+</kmodule>
