@@ -322,7 +322,7 @@ These Drools Fusion labs aim to build-up a small rulebase for an airport baggage
 === Fact/Event Model
 The _fact model_ contains the classes that define the facts and events over which the rules will reason. We will create objects from these classes and inject them into the Drools WorkingMemory (session).
 
-A UML representation of the model can be found at: https://www.lucidchart.com/invitations/accept/1a9ac865-2b3a-45c7-8d03-15c0eb9568fe
+* [A UML representation of the model] (https://www.lucidchart.com/invitations/accept/1a9ac865-2b3a-45c7-8d03-15c0eb9568fe)
 
 The examples are modelled around an airport baggage scanning system. The rules are, among other things, responsible for detecting lost luggage, calculating the amount of luggage that enters a certain location at the airport and calculating the average processing time to detect potential upcoming problems early in the system.
 
